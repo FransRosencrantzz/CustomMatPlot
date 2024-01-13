@@ -353,10 +353,20 @@ prepareDataForVerticalOrHorizontalLines(const std::vector<ValueType>& coordinate
 
 void Plot::plotVerticalLines(const std::vector<float>& x_coordinates,
                              const GraphAttributeList& graph_attributes) {
-  auto [y_data, x_data] = prepareDataForVerticalOrHorizontalLines<float>(x_coordinates, m_y_lim);
+  auto [y_data, x_data] =
+      prepareDataForVerticalOrHorizontalLines<float>(x_coordinates, m_y_lim);
   if (y_data.empty() || x_data.empty()) return;
 
   plotInternal<GraphLineType::vertical>(y_data, x_data, graph_attributes);
+}
+
+void Plot::plotHorizontalLine(const std::vector<float>& y_coordinates,
+                              const GraphAttribute& graph_attribute) {
+  auto [y_data, x_data] =
+      prepareDataForVerticalOrHorizontalLines<float>(y_coordinates, m_x_lim);
+  if (y_data.empty() || x_data.empty()) return;
+
+  plotInternal<GraphLineType::horizontal>(y_data, x_data, {graph_attribute});
 }
 
 template <GraphLineType t_graph_line_type>
