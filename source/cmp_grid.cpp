@@ -221,7 +221,8 @@ void Grid::addTranslucentGridLines() {
     const auto next_it = std::next(grid_line, 1);
     if (!prev_gridline && next_it != m_grid_lines.end() &&
         next_it->direction == grid_line->direction)
-      UNLIKELY {
+      {
+        UNLIKELY
         translucent_grid_line =
             getTranslucentGridLine(&(*grid_line), &(*next_it), false);
       }
@@ -231,7 +232,8 @@ void Grid::addTranslucentGridLines() {
     } else if (next_it == m_grid_lines.end() ||
                (next_it->direction != grid_line->direction) &&
                    prev_gridline->direction == grid_line->direction)
-      UNLIKELY {
+      {
+        UNLIKELY
         translucent_grid_line =
             getTranslucentGridLine(&(*grid_line), prev_gridline, false);
         addGridWithinBound(translucent_grid_line);
