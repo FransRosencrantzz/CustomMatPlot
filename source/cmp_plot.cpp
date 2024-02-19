@@ -193,18 +193,18 @@ void Plot::updateXLim(const Lim_f& new_x_lim) {
   throw std::invalid_argument("Min value must be lower than max value.");
 
   if ((abs(new_x_lim.max - new_x_lim.min) <
-       std::numeric_limits<float>::epsilon()))
-    UNLIKELY {
-      m_x_lim.min = new_x_lim.min - 1;
-      m_x_lim.max = new_x_lim.max + 1;
-    }
+       std::numeric_limits<float>::epsilon())) {
+    UNLIKELY
+    m_x_lim.min = new_x_lim.min - 1;
+    m_x_lim.max = new_x_lim.max + 1;
+  }
 
-  if (m_x_scaling == Scaling::logarithmic && new_x_lim.isMinOrMaxZero())
-    UNLIKELY {
-      throw std::invalid_argument(
-          "The min/max x-value is zero or 'xLim' has been called with a zero "
-          "value. 10log(0) = -inf");
-    }
+  if (m_x_scaling == Scaling::logarithmic && new_x_lim.isMinOrMaxZero()) {
+    UNLIKELY
+    throw std::invalid_argument(
+        "The min/max x-value is zero or 'xLim' has been called with a zero "
+        "value. 10log(0) = -inf");
+  }
 
   if (new_x_lim && new_x_lim != m_x_lim) {
     m_x_lim = new_x_lim;
@@ -220,18 +220,18 @@ void Plot::updateYLim(const Lim_f& new_y_lim) {
   throw std::invalid_argument("Min value must be lower than max value.");
 
   if (abs(new_y_lim.max - new_y_lim.min) <
-      std::numeric_limits<float>::epsilon())
-    UNLIKELY {
-      m_y_lim.min = new_y_lim.min - 1;
-      m_y_lim.max = new_y_lim.max + 1;
-    }
+      std::numeric_limits<float>::epsilon()) {
+    UNLIKELY
+    m_y_lim.min = new_y_lim.min - 1;
+    m_y_lim.max = new_y_lim.max + 1;
+  }
 
-  if (m_y_scaling == Scaling::logarithmic && new_y_lim.isMinOrMaxZero())
-    UNLIKELY {
-      throw std::invalid_argument(
-          "The min/max y-value is zero or 'yLim' has been called with a zero "
-          "value. 10log(0) = -inf");
-    }
+  if (m_y_scaling == Scaling::logarithmic && new_y_lim.isMinOrMaxZero()) {
+    UNLIKELY
+    throw std::invalid_argument(
+        "The min/max y-value is zero or 'yLim' has been called with a zero "
+        "value. 10log(0) = -inf");
+  }
 
   if (new_y_lim && m_y_lim != new_y_lim) {
     m_y_lim = new_y_lim;
@@ -679,16 +679,17 @@ void Plot::updateGraphLineYData(
     const GraphAttributeList& graph_attribute_list) {
   if (y_data.empty()) return;
 
-  if (y_data.size() != m_graph_lines->size<t_graph_line_type>()) UNLIKELY {
-      m_graph_lines->resize<t_graph_line_type>(y_data.size());
-      std::size_t graph_line_index = 0u;
-      for (auto& graph_line : *m_graph_lines) {
-        if (graph_line == nullptr) {
-          addGraphLineInternal<t_graph_line_type>(graph_line, graph_line_index);
-        }
-        graph_line_index++;
+  if (y_data.size() != m_graph_lines->size<t_graph_line_type>()) {
+    UNLIKELY
+    m_graph_lines->resize<t_graph_line_type>(y_data.size());
+    std::size_t graph_line_index = 0u;
+    for (auto &graph_line : *m_graph_lines) {
+      if (graph_line == nullptr) {
+        addGraphLineInternal<t_graph_line_type>(graph_line, graph_line_index);
       }
+      graph_line_index++;
     }
+  }
 
   auto y_data_it = y_data.begin();
   for (const auto& graph_line : *m_graph_lines) {
@@ -702,9 +703,10 @@ void Plot::updateGraphLineYData(
     }
   }
 
-  if (m_y_autoscale && !is_panning_or_zoomed) UNLIKELY {
-      setAutoYScale();
-    }
+  if (m_y_autoscale && !is_panning_or_zoomed) {
+    UNLIKELY
+    setAutoYScale();
+  }
 
   if (!graph_attribute_list.empty()) {
     auto it_gal = graph_attribute_list.begin();
@@ -830,6 +832,13 @@ void Plot::mouseHandler(const juce::MouseEvent& event,
       break;
     }
     case UserInputAction::remove_movable_graph_point: {
+      break;
+    }
+    case UserInputAction::start_move_horizontal_or_vertical_line: {
+      break;
+    }
+    case UserInputAction::move_horizontal_or_vertical_line: {
+      moveHorizontalOrVerticalLine(event);
       break;
     }
     default: {
@@ -992,6 +1001,11 @@ void Plot::moveLegend(const juce::MouseEvent& event) {
   m_comp_dragger.dragComponent(event.eventComponent, event, nullptr);
 }
 
+void Plot::void moveHorizontalOrVerticalLine(const juce::MouseEvent& event){
+  int i = 0;
+  i++;
+}
+
 void Plot::mouseDown(const juce::MouseEvent& event) {
   if (isVisible()) {
     m_prev_mouse_position = getMousePositionRelativeToGraphArea(event);
@@ -1003,9 +1017,12 @@ void Plot::mouseDown(const juce::MouseEvent& event) {
             event, lnf->getUserInputAction(UserInput::right | UserInput::drag |
                                            UserInput::graph_area));
       }
-    }
-
-    if (m_trace->isComponentTracePoint(event.eventComponent)) {
+      if (event.getNumberOfClicks() > 1) {
+        mouseHandler(event, lnf->getUserInputAction(UserInput::left |
+                                                    UserInput::double_click |
+                                                    UserInput::graph_area));
+      }
+    } else if (m_trace->isComponentTracePoint(event.eventComponent)) {
       if (!event.mods.isRightButtonDown()) {
         mouseHandler(
             event, lnf->getUserInputAction(UserInput::left | UserInput::start |
@@ -1015,12 +1032,6 @@ void Plot::mouseDown(const juce::MouseEvent& event) {
 
     if (m_mouse_drag_state == MouseDragState::none) {
       m_mouse_drag_state = MouseDragState::start;
-    }
-
-    if (event.getNumberOfClicks() > 1) {
-      mouseHandler(event, lnf->getUserInputAction(UserInput::left |
-                                                  UserInput::double_click |
-                                                  UserInput::graph_area));
     }
   }
 }
@@ -1044,6 +1055,11 @@ void Plot::mouseDrag(const juce::MouseEvent& event) {
                                 UserInput::left | UserInput::drag |
                                 UserInput::start | UserInput::graph_area));
         m_mouse_drag_state = MouseDragState::drag;
+      } else if (m_graph_lines.findLineContainingPixelOnContour(m_prev_mouse_position, 10.0f)) {
+        mouseHandler(event, lnf->getUserInputAction(UserInput::left |
+                                                    UserInput::drag |
+                                                    UserInput::graph_area |
+                                                    UserInput::horizontal_vertical_line));
       } else {
         mouseHandler(event,
                      lnf->getUserInputAction(UserInput::left | UserInput::drag |
@@ -1152,14 +1168,14 @@ void Plot::setGraphLineDataChangedCallback(
   m_graph_lines_changed_callback = graph_lines_changed_callback;
 }
 
-void Plot::panning(const juce::MouseEvent& event) {
+void Plot::panning(const juce::MouseEvent &event) {
   if (m_x_scaling == Scaling::logarithmic ||
-      m_y_scaling == Scaling::logarithmic)
-    UNLIKELY {
-      jassertfalse;  // Panning is not implemented for logarithmic scaling.
-      // TODO: Implement panning for logarithmic scaling.
-      return;
-    }
+      m_y_scaling == Scaling::logarithmic) {
+    UNLIKELY
+    jassertfalse; // Panning is not implemented for logarithmic scaling.
+    // TODO: Implement panning for logarithmic scaling.
+    return;
+  }
 
   const auto mouse_pos = getMousePositionRelativeToGraphArea(event);
   const auto current_pos =
