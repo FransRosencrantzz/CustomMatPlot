@@ -130,6 +130,7 @@ enum class UserInput : uint64_t {
   legend = 1ULL << 47,
   tracepoint = 1ULL << 48,
   trace_label = 1ULL << 49,
+  horizontal_vertical_line = 1ULL << 50,
 
 };
 
@@ -170,6 +171,10 @@ enum class UserInputAction : uint32_t {
 
   /** Panning */
   panning, /** Panning. */
+
+  /** Graph line related actions. */
+  start_move_horizontal_or_vertical_line, /** Move a horizontal or vertical line. */
+  move_horizontal_or_vertical_line, /** Move a horizontal or vertical line. */
 
   /** No action */
   none /** No action. */

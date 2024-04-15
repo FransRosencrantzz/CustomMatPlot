@@ -1001,7 +1001,7 @@ void Plot::moveLegend(const juce::MouseEvent& event) {
   m_comp_dragger.dragComponent(event.eventComponent, event, nullptr);
 }
 
-void Plot::void moveHorizontalOrVerticalLine(const juce::MouseEvent& event){
+void Plot::moveHorizontalOrVerticalLine(const juce::MouseEvent& event){
   int i = 0;
   i++;
 }
@@ -1055,7 +1055,7 @@ void Plot::mouseDrag(const juce::MouseEvent& event) {
                                 UserInput::left | UserInput::drag |
                                 UserInput::start | UserInput::graph_area));
         m_mouse_drag_state = MouseDragState::drag;
-      } else if (m_graph_lines.findLineContainingPixelOnContour(m_prev_mouse_position, 10.0f)) {
+      } else if (m_graph_lines->findLineContainingPixelOnContour(m_prev_mouse_position, 10.0f)) {
         mouseHandler(event, lnf->getUserInputAction(UserInput::left |
                                                     UserInput::drag |
                                                     UserInput::graph_area |

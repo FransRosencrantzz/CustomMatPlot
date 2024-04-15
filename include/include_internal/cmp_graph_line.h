@@ -155,7 +155,7 @@ class GraphLine : public juce::Component {
    */
   const GraphPoints& getGraphPoints() const noexcept;
 
-  /* @brief Get the graph point indices
+  /** @brief Get the graph point indices
    *
    *  Get a const reference of the calculated graph point indices.
    *
@@ -293,7 +293,17 @@ struct GraphLineList : public std::vector<std::unique_ptr<GraphLine>> {
     template <GraphLineType t_graph_line_type, typename ValueType>
     void setLimitsForVerticalOrHorizontalLines(const Lim<ValueType>& x_or_y_limit);
 
-    private:
+    /** @brief Find the line containing a pixel on the contour of the line.
+     *
+     * @param pixel the pixel to check.
+     * @param threshold the threshold to check.
+     * @return the GraphLine* if point is on line.
+     * @return nullptr if point is not on line.
+     */
+    GraphLine *findLineContainingPixelOnContour(const juce::Point<float> &pixel,
+                                                const float threshold) const;
+
+  private:
     /** @internal */
     template <GraphLineType t_graph_line_type>
     std::vector<GraphLine*> getGraphLinesOfType();

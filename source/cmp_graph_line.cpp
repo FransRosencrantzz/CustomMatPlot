@@ -18,6 +18,42 @@
 
 namespace cmp {
 
+static bool isPointOnLine(const std::vector<juce::Point<float>>& line,
+                   const juce::Point<float>& pixelPoint,
+                   const float threshold) {
+  if (line.size() < 2) {
+    // At least two points are required to define a line
+    return false;
+  }
+
+  auto distance =
+      [](const juce::Point<float>& p1, const juce::Point<float>& p2) {
+        return std::sqrt(std::pow(p2.getX() - p1.getX(), 2) + std::pow(p2.getY() - p1.getY(), 2));
+      };
+
+  for (size_t i = 0; i < line.size() - 1; ++i) {
+    const juce::Point<float>& p1 = line[i];
+    const juce::Point<float>& p2 = line[i + 1];
+
+    const float dist = distance(p1, p2);
+
+    // Calculate the signed distance from the point to the line using the vector
+    // cross product
+    const float signedDist =
+        ((pixelPoint.getX() - p1.getX()) * (p2.getY() - p1.getY()) -
+         (pixelPoint.getY() - p1.getY()) * (p2.getX() - p1.getX())) /
+        dist;
+
+    // Check if the point is within the threshold distance of the line
+    if (std::abs(signedDist) < threshold) {
+      return (distance(p1, pixelPoint) <= dist &&
+              distance(p2, pixelPoint) <= dist);
+      }
+    }
+    
+    return false;
+  }
+
 GraphLineDataView::GraphLineDataView(
     const std::vector<float>& _x_data, const std::vector<float>& _y_data,
     const GraphPoints& _graph_points,
@@ -413,6 +449,16 @@ std::vector<GraphLine*> GraphLineList::getGraphLinesOfType(){
         }
     }
     return result;
+}
+
+GraphLine* GraphLineList::findLineContainingPixelOnContour(
+    const juce::Point<float>& pixel, const float threshold) const {
+  for (const auto& graph_line : *this) {
+    if (isPointOnLine(graph_line->getGraphPoints(), pixel, threshold)) {
+      return graph_line.get();
+    }
+  }
+  return nullptr;
 }
 
 /************************************************************************************/

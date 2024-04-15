@@ -805,6 +805,9 @@ PlotLookAndFeel::getDefaultUserInputMapAction() const noexcept {
   action_map[UserInput::left | UserInput::double_click | UserInput::graph_area] =            UserInputAction::create_tracepoint;
   action_map[UserInput::left | UserInput::drag | UserInput::ctrl| UserInput::graph_area] =   UserInputAction::panning;
 
+  action_map[UserInput::left | UserInput::drag | UserInput::start | UserInput::graph_area | UserInput::horizontal_vertical_line] =   UserInputAction::start_move_horizontal_or_vertical_line;
+  action_map[UserInput::left | UserInput::drag | UserInput::graph_area | UserInput::horizontal_vertical_line] =                      UserInputAction::move_horizontal_or_vertical_line;
+
   action_map[UserInput::left | UserInput::start | UserInput::tracepoint] = UserInputAction::select_tracepoint;
   action_map[UserInput::left | UserInput::end | UserInput::tracepoint] =   UserInputAction::deselect_tracepoint;
 

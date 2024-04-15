@@ -673,6 +673,8 @@ class Plot : public juce::Component {
   /** @internal */
   void moveLegend(const juce::MouseEvent& event);
   /** @internal */
+  void moveHorizontalOrVerticalLine(const juce::MouseEvent& event);
+  /** @internal */
   void selectedTracePointsWithinSelectedArea();
   /** @internal */
   void selectTracePoint(const juce::MouseEvent& event);
